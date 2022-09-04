@@ -57,47 +57,57 @@ public class AVLBinaryTree {
         Node balanceStartPoint;
         Node nodeToDelete = this.root.searchNode(data);
         if (nodeToDelete != null) {
+
             if (nodeToDelete.left == null) {
                 if (nodeToDelete.right == null) {
-                    if (nodeToDelete.parent.left == nodeToDelete) {            // if there is no one on the right or left
-                        nodeToDelete.parent.left = null;
+                    if (nodeToDelete.parent != null) {
+                        if (nodeToDelete.parent.left == nodeToDelete) {            // if there is no one on the right or left
+                            nodeToDelete.parent.left = null;
+                        } else {
+                            nodeToDelete.parent.right = null;
+                        }
                     } else {
-                        nodeToDelete.parent.right = null;
+                        this.root = null;
                     }
-                } else {                                                      //      if this one is on the right
-                    if (nodeToDelete.parent.left == nodeToDelete) {
-                        nodeToDelete.parent.left = nodeToDelete.right;
+                } else {
+                    if (nodeToDelete.parent != null) {                    //      if something is on the right
+                        if (nodeToDelete.parent.left == nodeToDelete) {
+                            nodeToDelete.parent.left = nodeToDelete.right;
+                        } else {
+                            nodeToDelete.parent.right = nodeToDelete.right;
+                        }
+                        nodeToDelete.right.parent = nodeToDelete.parent;
+                        nodeToDelete.parent.balanceSubTree();
+
                     } else {
-                        nodeToDelete.parent.right = nodeToDelete.right;
+                        this.root = this.root.right;
+                        this.root.parent = null;
+                        this.root.balanceSubTree();
                     }
-                    nodeToDelete.right.parent = nodeToDelete.parent;
                 }
-                nodeToDelete.parent.balanceSubTree();
                 balanceStartPoint = nodeToDelete.parent;
             } else {                                                     //   if there is something on the left
-                Node theBiggestChildOnTheLeftSide = nodeToDelete.left;
-                while (theBiggestChildOnTheLeftSide.right != null) {
-                    theBiggestChildOnTheLeftSide = theBiggestChildOnTheLeftSide.right;
+                Node theFurthestChildOnTheLeftSide = nodeToDelete.left;
+                while (theFurthestChildOnTheLeftSide.right != null) {
+                    theFurthestChildOnTheLeftSide = theFurthestChildOnTheLeftSide.right;
                 }
-                if (theBiggestChildOnTheLeftSide.parent.right == theBiggestChildOnTheLeftSide) {
-                    theBiggestChildOnTheLeftSide.parent.right = theBiggestChildOnTheLeftSide.left;
+                if (theFurthestChildOnTheLeftSide.parent.right == theFurthestChildOnTheLeftSide) {
+                    theFurthestChildOnTheLeftSide.parent.right = theFurthestChildOnTheLeftSide.left;
                 } else {
-                    theBiggestChildOnTheLeftSide.parent.left = theBiggestChildOnTheLeftSide.left;
-                }
-                if (theBiggestChildOnTheLeftSide.left != null) {
-                    theBiggestChildOnTheLeftSide.left.parent = theBiggestChildOnTheLeftSide.parent;
+                    theFurthestChildOnTheLeftSide.parent.left = theFurthestChildOnTheLeftSide.left;
                 }
 
-                nodeToDelete.data = theBiggestChildOnTheLeftSide.data;
-                theBiggestChildOnTheLeftSide.parent.balanceSubTree();
-                balanceStartPoint = theBiggestChildOnTheLeftSide.parent;
+                nodeToDelete.data = theFurthestChildOnTheLeftSide.data;
+                theFurthestChildOnTheLeftSide.parent.balanceSubTree();
+                balanceStartPoint = theFurthestChildOnTheLeftSide.parent;
             }
 
-            while (balanceStartPoint.parent != null) {
-                balanceStartPoint = balanceStartPoint.parent;
+            if (balanceStartPoint != null) {
+                while (balanceStartPoint.parent != null) {
+                    balanceStartPoint = balanceStartPoint.parent;
+                }
+                this.root = balanceStartPoint;
             }
-            this.root = balanceStartPoint;
-
         } else {
             System.out.println("There is nothing to delete");
         }
